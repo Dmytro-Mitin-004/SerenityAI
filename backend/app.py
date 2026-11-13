@@ -450,17 +450,6 @@ def analyze_voice():
         if os.path.exists(audio_path):
             os.remove(audio_path)
 
-# Route for text-based emotion analysis
-@app.route("/analyze-text", methods=["POST"])
-def analyze_text():
-    data = request.json
-    if "text" not in data:
-        return jsonify({"error": "Missing 'text' field"}), 400
-    
-    text = data["text"]
-    emotion_results = analyze_text_emotions(text)
-    
-    return jsonify({"emotion_analysis": emotion_results})
 
 # Route for Gemini Generate Questions Based on Log
 @app.route("/generate-questions", methods=["POST"])

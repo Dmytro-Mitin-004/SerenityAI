@@ -2,6 +2,7 @@
 # python -m spacy download en_core_web_sm
 
 flask==2.3.2
+flask-cors==4.0.0
 google-cloud-speech==2.15.1
 librosa==0.10.0
 numpy==1.26.4
