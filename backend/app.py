@@ -401,7 +401,7 @@ def save_journal_entry():
 # Gemini Handling For Custom Querys
 def GeminiCustom(query):
     return _gemini_client.models.generate_content(
-        model = 'gemini-2.0-pro-exp-02-05',
+        model = 'gemini-2.0-flash',
         contents = query)
 
 # Function to split text into sentences (without using NLTK)
