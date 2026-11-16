@@ -43,6 +43,7 @@ Create a `.env` file inside `backend/`:
 
 ```
 GOOGLE_API_KEY=your_gemini_api_key
+ASSEMBLYAI_API_KEY=your_assemblyai_api_key
 ```
 
 > Get a free Gemini API key at https://aistudio.google.com — the key starts with `AIza...`.
@@ -88,7 +89,7 @@ Runs on `http://localhost:3000`. The frontend expects the backend at `http://127
 | Key | Required | Where to get it |
 |---|---|---|
 | `GOOGLE_API_KEY` | Yes | https://aistudio.google.com — free tier is sufficient |
-| AssemblyAI key | Yes (voice only) | Hardcoded in `utils/transcription.py` — works out of the box, replace with your own key from https://assemblyai.com if it expires |
+| `ASSEMBLYAI_API_KEY` | Yes (voice only) | https://assemblyai.com — free tier supports ~100 hours/month |
 
 ## Notes
 

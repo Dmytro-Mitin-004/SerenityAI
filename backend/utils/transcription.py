@@ -3,7 +3,7 @@ import requests
 import time
 
 # AssemblyAI API settings
-ASSEMBLYAI_API_KEY = "b7f38fb72c5b4577b0ad6c80fcb0a448"
+ASSEMBLYAI_API_KEY = os.getenv("ASSEMBLYAI_API_KEY", "")
 ASSEMBLYAI_UPLOAD_URL = "https://api.assemblyai.com/v2/upload"
 ASSEMBLYAI_TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
 
