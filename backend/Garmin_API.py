@@ -2,16 +2,23 @@ from garminconnect import Garmin
 from google import genai
 from datetime import datetime
 from math import floor
+import os
 
 
-# Logs Into and Initializes Googles Gemini AI
-client = genai.Client(api_key= ) #Removed API key for security purposes
+# Configure via GOOGLE_API_KEY environment variable or set directly
+_api_key = os.getenv("GOOGLE_API_KEY", "")
+client = genai.Client(api_key=_api_key)
 
-# Initializing Garmdown and Garmin Connect Database
-username = 'falseuser@yahoo.com'
-password = 'falseEmail'
-garmin = Garmin(username, password)
-garmin.login()
+# Configure via GARMIN_USERNAME / GARMIN_PASSWORD environment variables or set directly
+username = os.getenv("GARMIN_USERNAME", "")
+password = os.getenv("GARMIN_PASSWORD", "")
+garmin = None
+try:
+    if username and password:
+        garmin = Garmin(username, password)
+        garmin.login()
+except Exception:
+    pass
 
 #Todays Date as String
 #Date = datetime.today().strftime('%Y-%m-%d') # %Y = 2025   %y = 25
@@ -84,5 +91,8 @@ def CustomReply(custom) :
     return (responseCustom.text)
 
 
-# Garmin Connect Logout to Protect Privacy
-garmin.logout()
+if garmin:
+    try:
+        garmin.logout()
+    except Exception:
+        pass
