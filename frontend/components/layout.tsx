@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Moon, Sun, Home, BookOpen, History, Settings, User, Sparkles } from "lucide-react"
+import { Moon, Sun, Home, BookOpen, History, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -158,25 +158,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Link href="/ask-serenity">
                     <Sparkles className="h-4 w-4" />
                     <span>Ask Serenity</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-            <Separator className="my-4" />
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/settings">
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">
-                    <User className="h-4 w-4" />
-                    <span>Profile</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

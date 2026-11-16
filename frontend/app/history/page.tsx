@@ -148,8 +148,8 @@ export default function HistoryPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredEntries.length > 0 ? (
-                      filteredEntries.map((entry) => (
-                        <TableRow key={entry.id}>
+                      filteredEntries.map((entry, i) => (
+                        <TableRow key={`${entry.id}-${i}`}>
                           <TableCell>
                             <div className="font-medium">{formatDate(entry.date)}</div>
                             <div className="text-xs text-muted-foreground">{new Date(entry.date).toLocaleTimeString()}</div>

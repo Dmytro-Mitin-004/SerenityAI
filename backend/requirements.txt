@@ -1,13 +1,12 @@
 # Install Dependencies with "pip install -r requirements.txt"
 # python -m spacy download en_core_web_sm
 
-flask==2.3.2
-flask-cors==4.0.0
-google-cloud-speech==2.15.1
-librosa==0.10.0
-numpy==1.26.4
-python-dotenv==0.21.0
-opensmile==2.5.1
+flask
+flask-cors
+librosa
+numpy
+python-dotenv
+opensmile
 joblib
 scikit-learn
 pandas
@@ -17,6 +16,5 @@ torchvision
 matplotlib
 transformers
 google-genai
-transformers
 spacy
-pydub
+soundfile

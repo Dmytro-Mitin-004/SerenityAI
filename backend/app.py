@@ -17,7 +17,6 @@ from datetime import datetime
 from flask_cors import CORS
 from transformers import GPTNeoForCausalLM, GPT2Tokenizer
 import logging
-from pydub import AudioSegment
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -315,15 +314,6 @@ def save_journal_entry():
             if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
                 logger.error("Audio file is empty or not saved correctly")
                 return jsonify({"error": "Audio file is empty or not saved correctly"}), 400
-
-            # Convert the audio file to a supported format if necessary
-            try:
-                audio = AudioSegment.from_file(audio_path)
-                audio.export(audio_path, format="wav")  # Ensure it's in WAV format
-                logger.debug("Audio file converted to WAV format")
-            except Exception as e:
-                logger.error(f"Error converting audio file: {e}")
-                return jsonify({"error": "Failed to process audio file format"}), 400
 
             logger.debug("Starting transcription")
             transcription = transcribe_audio(audio_path)
