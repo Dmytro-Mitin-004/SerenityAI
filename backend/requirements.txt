@@ -16,7 +16,6 @@ einops
 torchvision
 matplotlib
 transformers
-garminconnect
 google-genai
 transformers
 spacy

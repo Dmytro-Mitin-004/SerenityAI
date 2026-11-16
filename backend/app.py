@@ -11,7 +11,6 @@ from utils.hatman_model import classify_audio
 from utils.emotion_utils import combine_results, LABEL_MAPPING
 from utils.transcription import transcribe_audio
 from utils.activity_detector import extract_activities
-import Garmin_API
 from google import genai
 import csv
 from datetime import datetime
@@ -28,6 +27,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 app = Flask(__name__)
+_gemini_client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY", ""))
 CORS(app) 
 
 # Load the GPT-Neo model and tokenizer
@@ -400,8 +400,8 @@ def save_journal_entry():
         return jsonify({"error": "Missing 'audio' or 'journal_entry' in request"}), 400
 # Gemini Handling For Custom Querys
 def GeminiCustom(query):
-    return Garmin_API.client.models.generate_content(
-        model = 'gemini-2.0-pro-exp-02-05', 
+    return _gemini_client.models.generate_content(
+        model = 'gemini-2.0-pro-exp-02-05',
         contents = query)
 
 # Function to split text into sentences (without using NLTK)
@@ -463,27 +463,6 @@ def generateQuestions():
     return jsonify({"Generated Questions": GeminiCustom(f'Generate 1-5 follow up questions about the users log to further the understanding of the clients emotions, activities throughout the day and stress levels. Keep the questions engaging and brief. The users log : {text} .')})
 
 # Route for Gemini Based Garmin Watch Analysis
-@app.route("/analyze-Garmin", methods=["POST"])
-def analyze_Garmin():
-    data = request.json   # json should be {'requestType' : int , 'Custom' : 'somestring'}
-
-    if data['requestType'] == 1:
-        return jsonify({'Sleep' : Garmin_API.GetSleepReply()})
-    
-    elif data['requestType'] == 2:
-        return jsonify({'Heart Rate' : Garmin_API.GetBPMReply()})
-    
-    elif data['requestType'] == 3:
-        return jsonify({'Activity' : Garmin_API.GetActivityReply()})
-    
-    elif data['requestType'] == 4:
-        return jsonify({'Stress Level' : Garmin_API.GetStressReply()})
-    
-    else:
-        if data['Custom Query'] != '' :
-            return jsonify({'Custom': GeminiCustom(data['Custom Query'])})
-        else:
-            return jsonify({'Error': 'No String Provided For Query'})
 
 @app.route("/analyze-activity-impact", methods=["POST"])
 def analyze_activity_impact():

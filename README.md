@@ -1,95 +1,96 @@
 # SerenityAI
 
-A mental wellness platform built for the Innovaite hackathon. Combines voice and text journalling with wearable data (Garmin) to track emotional wellbeing over time — using on-device NLP for emotion classification and Google Gemini for personalised feedback.
+An AI-powered mental wellbeing companion that combines emotion detection, voice journaling, and LLM-driven insights to track and improve user wellbeing over time.
 
 ## What it does
 
-- **Text journalling** — submit journal entries; the backend classifies emotion (DistilBERT), extracts activities (spaCy NER), and scores wellbeing
-- **Voice journalling** — record audio; the backend transcribes it (Whisper), runs tone analysis (openSMILE), and classifies emotion
-- **Wellbeing dashboard** — 7-day wellbeing trend, mood distribution, Gemini-generated insights, activity-impact rankings
-- **Garmin integration** — pulls sleep, heart rate, activity, and stress data from a Garmin Connect account; Gemini generates a personalised health summary
-- **AI chat** — GPT-Neo 1.3B answers questions about your journal history
+- **Text & voice journaling** — submit journal entries via text or audio; the backend transcribes audio (AssemblyAI), runs emotion classification (DistilBERT), and stores a wellbeing score
+- **Multi-modal emotion analysis** — combines audio-based emotion detection (Hatman model + OpenSMILE acoustic features) with text-based classification
+- **AI chat** — conversational interface powered by Gemini that has context of your journal history
+- **Follow-up questions** — Gemini generates personalised follow-up questions based on journal entries
+- **Activity impact tracking** — correlates logged activities with wellbeing scores over time
+- **Dashboard** — Next.js UI with weekly mood trends, wellbeing scores, and journal history
 
 ## Stack
 
-| | |
+| Layer | Tech |
 |---|---|
-| Backend | Python 3 / Flask, flask-cors |
-| NLP / ML | HuggingFace Transformers (DistilBERT, GPT-Neo 1.3B), spaCy, openSMILE |
-| Transcription | OpenAI Whisper (via `transformers`) |
-| Wearables | Garmin Connect API (`garminconnect`) |
-| AI | Google Gemini (`google-genai`) |
-| Frontend | Next.js, Tailwind CSS, shadcn/ui |
-| Data store | CSV (journal entries) |
+| Backend API | Python / Flask |
+| Emotion (text) | HuggingFace Transformers — `distilbert-base-uncased-emotion` |
+| Emotion (audio) | HuggingFace — `Hatman/audio-emotion-detection` + OpenSMILE |
+| Transcription | AssemblyAI API |
+| LLM / chat | Google Gemini API (`google-genai`) |
+| Activity detection | spaCy `en_core_web_sm` |
+| Storage | CSV (flat file, `backend/data/journal_entries.csv`) |
+| Frontend | Next.js 15, Tailwind CSS, shadcn/ui |
 
-## Running the backend
+## Running locally
 
-**Requirements:** Python 3.10+, ~8 GB free disk space (GPT-Neo 1.3B + ML models auto-download on first run)
+### 1. Backend
+
+**Prerequisites:** Python 3.10+, pip
 
 ```bash
-git clone https://github.com/Trexicurity07/SerenityAI.git
-cd SerenityAI/backend
+cd backend
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-### Credentials (required for full functionality)
+Create a `.env` file inside `backend/`:
 
-The app starts without credentials but Garmin and Gemini endpoints will return errors until configured. Set these as environment variables before running:
-
-```bash
-# Google Gemini API key — get one free at https://aistudio.google.com/
-export GOOGLE_API_KEY="your-gemini-api-key"
-
-# Garmin Connect login (your personal Garmin account)
-export GARMIN_USERNAME="your-garmin-email@example.com"
-export GARMIN_PASSWORD="your-garmin-password"
+```
+GOOGLE_API_KEY=your_gemini_api_key
 ```
 
-On Windows (PowerShell):
-```powershell
-$env:GOOGLE_API_KEY = "your-gemini-api-key"
-$env:GARMIN_USERNAME = "your-garmin-email@example.com"
-$env:GARMIN_PASSWORD = "your-garmin-password"
-```
+> Get a Gemini API key at https://aistudio.google.com — free tier is sufficient.
 
-Then start the server:
+Start the backend:
 
 ```bash
 python app.py
-# Runs on http://127.0.0.1:5000
 ```
 
-> The first run downloads GPT-Neo 1.3B (~5 GB) automatically via HuggingFace. Subsequent starts are fast.
+Runs on `http://localhost:5000`.
 
-### Without credentials
+**Note:** On first run, `transformers` will download two models (~500 MB total — DistilBERT and Hatman audio model). This is a one-time download; subsequent starts use the local cache.
 
-Journal entries, emotion analysis, and the wellbeing dashboard all work without any credentials. Only the `/analyze-Garmin` and Gemini-powered routes need the keys above.
+### 2. Frontend
 
-## Running the frontend
-
-**Requirements:** Node.js 18+
+**Prerequisites:** Node.js 18+, npm
 
 ```bash
-cd SerenityAI/frontend
+cd frontend
 npm install
 npm run dev
-# Runs on http://localhost:3000
 ```
 
-The frontend expects the backend at `http://127.0.0.1:5000`.
+Runs on `http://localhost:3000`. The frontend expects the backend at `http://127.0.0.1:5000` (hardcoded — no env config needed for local dev).
 
-## API overview
+## API routes
 
-| Method | Endpoint | Description |
+| Method | Route | Description |
 |---|---|---|
-| POST | `/save-journal-entry` | Save text entry — classifies emotion and scores wellbeing |
-| POST | `/analyze-text` | Classify emotion from text |
-| POST | `/analyze-voice` | Transcribe audio and classify emotion |
-| POST | `/generate-questions` | Generate reflective journal prompts |
-| GET | `/api/wellbeing-score` | Current overall wellbeing score |
-| GET | `/api/wellbeing-scores-last-7-days` | 7-day trend |
-| GET | `/api/journal-entries` | All saved entries |
-| POST | `/api/chat` | Chat with GPT-Neo about your journal |
-| POST | `/analyze-Garmin` | Fetch Garmin data + Gemini summary (requires credentials) |
-| POST | `/analyze-activity-impact` | Rank activities by their effect on wellbeing |
+| POST | `/save-journal-entry` | Submit text or audio journal entry |
+| GET | `/api/journal-entries` | Fetch all journal entries |
+| GET | `/api/wellbeing-score` | Most recent wellbeing score |
+| GET | `/api/wellbeing-scores-last-7-days` | Wellbeing scores for last 7 entries |
+| POST | `/analyze-text` | Emotion analysis on arbitrary text |
+| POST | `/analyze-voice` | Emotion analysis on audio file |
+| POST | `/api/chat` | Chat with Gemini using journal context |
+| POST | `/generate-questions` | Generate follow-up questions from a log |
+| POST | `/analyze-activity-impact` | Rank activities by wellbeing impact |
+
+## Credentials & sensitive data
+
+| Key | Required | Used for | Status |
+|---|---|---|---|
+| `GOOGLE_API_KEY` | Yes | Gemini (chat, question generation) | Set in `backend/.env` — never committed |
+| AssemblyAI key | Yes | Audio transcription | Hardcoded in `utils/transcription.py` — **rotate before sharing** |
+
+> **TODO before making repo fully public:** replace the hardcoded AssemblyAI key in `utils/transcription.py` with `os.getenv("ASSEMBLYAI_API_KEY")` and add it to `.env`.
+
+## Notes
+
+- Journal entries persist in `backend/data/journal_entries.csv`. Delete this file to reset all data.
+- Garmin Connect integration has been removed — the API credentials are short-lived and require an active Garmin device.
+- The Flask template frontend (`frontend/app.py` + `frontend/templates/`) is an older prototype. Use the Next.js frontend for the full experience.
