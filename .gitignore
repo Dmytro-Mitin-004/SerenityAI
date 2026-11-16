@@ -1,0 +1,19 @@
+# env
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# HuggingFace model cache
+*.bin
+*.safetensors

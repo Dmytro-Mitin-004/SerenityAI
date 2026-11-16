@@ -6,7 +6,7 @@ An AI-powered mental wellbeing companion that combines emotion detection, voice 
 
 - **Text & voice journaling** — submit journal entries via text or audio; the backend transcribes audio (AssemblyAI), runs emotion classification (DistilBERT), and stores a wellbeing score
 - **Multi-modal emotion analysis** — combines audio-based emotion detection (Hatman model + OpenSMILE acoustic features) with text-based classification
-- **AI chat** — conversational interface powered by Gemini that has context of your journal history
+- **AI chat** — conversational interface powered by Gemini with context from your journal history
 - **Follow-up questions** — Gemini generates personalised follow-up questions based on journal entries
 - **Activity impact tracking** — correlates logged activities with wellbeing scores over time
 - **Dashboard** — Next.js UI with weekly mood trends, wellbeing scores, and journal history
@@ -19,16 +19,19 @@ An AI-powered mental wellbeing companion that combines emotion detection, voice 
 | Emotion (text) | HuggingFace Transformers — `distilbert-base-uncased-emotion` |
 | Emotion (audio) | HuggingFace — `Hatman/audio-emotion-detection` + OpenSMILE |
 | Transcription | AssemblyAI API |
-| LLM / chat | Google Gemini API (`google-genai`) |
+| LLM / chat | Google Gemini API (`gemini-2.0-flash`) |
 | Activity detection | spaCy `en_core_web_sm` |
 | Storage | CSV (flat file, `backend/data/journal_entries.csv`) |
 | Frontend | Next.js 15, Tailwind CSS, shadcn/ui |
 
 ## Running locally
 
-### 1. Backend
+### Requirements
 
-**Prerequisites:** Python 3.10+, pip
+- **Python 3.10, 3.11, or 3.12** — Python 3.13+ is not supported due to packages that depend on the `audioop` standard library module which was removed in 3.13. Download Python 3.12 from https://python.org if needed.
+- **Node.js 18+**
+
+### 1. Backend
 
 ```bash
 cd backend
@@ -42,7 +45,7 @@ Create a `.env` file inside `backend/`:
 GOOGLE_API_KEY=your_gemini_api_key
 ```
 
-> Get a Gemini API key at https://aistudio.google.com — free tier is sufficient.
+> Get a free Gemini API key at https://aistudio.google.com — the key starts with `AIza...`.
 
 Start the backend:
 
@@ -52,19 +55,19 @@ python app.py
 
 Runs on `http://localhost:5000`.
 
-**Note:** On first run, `transformers` will download two models (~500 MB total — DistilBERT and Hatman audio model). This is a one-time download; subsequent starts use the local cache.
+**Note:** On first run, `transformers` downloads two models (~500 MB total). This takes a few minutes and is a one-time download — subsequent starts are instant.
 
 ### 2. Frontend
 
-**Prerequisites:** Node.js 18+, npm
-
 ```bash
 cd frontend
-npm install
+npm install --legacy-peer-deps
 npm run dev
 ```
 
-Runs on `http://localhost:3000`. The frontend expects the backend at `http://127.0.0.1:5000` (hardcoded — no env config needed for local dev).
+> `--legacy-peer-deps` is required because `react-day-picker` has a peer dependency conflict with the version of `date-fns` used in this project. This is safe to ignore.
+
+Runs on `http://localhost:3000`. The frontend expects the backend at `http://127.0.0.1:5000` — no additional config needed for local dev.
 
 ## API routes
 
@@ -80,14 +83,12 @@ Runs on `http://localhost:3000`. The frontend expects the backend at `http://127
 | POST | `/generate-questions` | Generate follow-up questions from a log |
 | POST | `/analyze-activity-impact` | Rank activities by wellbeing impact |
 
-## Credentials & sensitive data
+## Credentials
 
-| Key | Required | Used for | Status |
-|---|---|---|---|
-| `GOOGLE_API_KEY` | Yes | Gemini (chat, question generation) | Set in `backend/.env` — never committed |
-| AssemblyAI key | Yes | Audio transcription | Hardcoded in `utils/transcription.py` — **rotate before sharing** |
-
-> **TODO before making repo fully public:** replace the hardcoded AssemblyAI key in `utils/transcription.py` with `os.getenv("ASSEMBLYAI_API_KEY")` and add it to `.env`.
+| Key | Required | Where to get it |
+|---|---|---|
+| `GOOGLE_API_KEY` | Yes | https://aistudio.google.com — free tier is sufficient |
+| AssemblyAI key | Yes (voice only) | Hardcoded in `utils/transcription.py` — works out of the box, replace with your own key from https://assemblyai.com if it expires |
 
 ## Notes
 
